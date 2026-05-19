@@ -1,28 +1,159 @@
 # YouTube Article Mode
 
-A Chrome extension that converts YouTube videos into readable articles.
-Built to reduce YouTube addiction while keeping access to educational content.
+YouTube Article Mode is a Chrome extension that turns YouTube into a more deliberate, reading-first experience.
 
-## Status
-Work in progress. Currently: clickable YouTube cards can open an AI-generated reading view.
+Instead of dropping the user straight into video playback, the extension intercepts supported video clicks and offers a calmer choice: read an article version or go back. The goal is simple: keep the useful part of YouTube, reduce the compulsive part.
 
-## How to install
-1. Clone this repo
-2. Start the local article server with an environment variable:
-   `GEMINI_API_KEY=your_key_here node server.js`
-3. Open chrome://extensions
-4. Enable developer mode
-5. Click "Load unpacked" and select this folder
-6. Reload the extension after code changes so the background worker updates too
+## Why this exists
 
-## Current behavior
-1. Click a YouTube video card
-2. Choose `Read article`
-3. The extension sends the public YouTube URL to the local article server
-4. Gemini watches the video and the server returns an article to the extension
+YouTube is extremely good at making people keep watching.
 
-## Notes
-- This path uses Gemini video understanding instead of transcripts or captions
-- The YouTube URL must be public; private and unlisted videos are not supported by Gemini's YouTube URL input
-- The backend uses `gemini-3-flash-preview` because that is the official model documented for direct YouTube URL video input
-- End users are not asked for an API key; the secret lives on the backend server instead
+This project pushes in the other direction:
+
+- less autoplay energy
+- less thumbnail temptation
+- less accidental Shorts drift
+- more intentional learning
+- more text-first consumption
+
+## Core features
+
+- Intercepts standard YouTube video cards on the homepage
+- Intercepts standard YouTube video cards in search results
+- Opens a custom read-mode dialog before entering normal video flow
+- Generates an article version of a video through a local backend
+- Renders the generated article in an in-page reading overlay
+- Uses the same read-mode visual language across dialogs and article screens
+- Hides thumbnail-heavy presentation where possible to make browsing feel less addictive
+- Removes or reduces distracting result types such as playlists, mixes, and similar clutter
+- Blocks Shorts from behaving like normal supported videos
+- Shows a clear unsupported-state message for short-form content
+
+## Current user flow
+
+### Standard videos
+
+1. The user clicks a supported video card.
+2. A read-mode prompt opens.
+3. The user chooses `Read article` or `Go back`.
+4. If `Read article` is chosen, the extension sends the video URL to the local backend.
+5. The backend asks Gemini to generate a structured article.
+6. The article is rendered inside YouTube in a custom reader view.
+
+### Shorts
+
+1. The user clicks a Shorts-style entry point.
+2. The extension treats it as unsupported for read mode.
+3. A popup explains that short-form content does not have read mode.
+
+### Search results
+
+1. Search result videos use the same dialog and read-mode flow as homepage videos.
+2. Playlist-style and distraction-heavy result types are filtered where possible.
+3. Shorts are handled separately from normal videos.
+
+## Feature checklist
+
+### Reading experience
+
+- Pre-video decision dialog
+- Article-generation request flow
+- Full-screen article overlay
+- Consistent popup styling across normal and unsupported states
+
+### YouTube behavior changes
+
+- Homepage video interception
+- Search-result video interception
+- Thumbnail minimization
+- Playlist and mix reduction
+- Shorts unsupported-state handling
+
+### Backend architecture
+
+- Local Node backend
+- Gemini-based article generation
+- Extension background worker to forward requests
+- No end-user API key prompt inside the extension UI
+
+## Project structure
+
+- `/Users/karansinghmadia/Desktop/yt-article/content.js`
+  Main content script. Handles click interception, dialogs, article overlay rendering, and in-page YouTube behavior.
+
+- `/Users/karansinghmadia/Desktop/yt-article/content.css`
+  Styling for dialogs, overlays, and the reader experience.
+
+- `/Users/karansinghmadia/Desktop/yt-article/background.js`
+  Extension background worker that forwards article-generation requests to the backend.
+
+- `/Users/karansinghmadia/Desktop/yt-article/server.js`
+  Local backend that calls Gemini and returns structured article data.
+
+- `/Users/karansinghmadia/Desktop/yt-article/manifest.json`
+  Chrome extension manifest and permissions.
+
+- `/Users/karansinghmadia/Desktop/yt-article/docs/FEATURES.md`
+  Detailed feature reference.
+
+- `/Users/karansinghmadia/Desktop/yt-article/docs/SETUP.md`
+  Local setup and troubleshooting notes.
+
+## Local setup
+
+1. Make sure Node.js is installed.
+2. Get a Gemini API key.
+3. Start the backend:
+
+```bash
+GEMINI_API_KEY=your_key_here node server.js
+```
+
+4. Open `chrome://extensions`
+5. Turn on Developer Mode
+6. Click `Load unpacked`
+7. Select `/Users/karansinghmadia/Desktop/yt-article`
+8. Reload the extension after code changes
+
+For a more explicit setup walkthrough, see `/Users/karansinghmadia/Desktop/yt-article/docs/SETUP.md`.
+
+## How article generation works
+
+The extension does not ask the end user for an API key.
+
+Instead, the flow is:
+
+1. The content script captures the selected YouTube video.
+2. The extension forwards that request through the background worker.
+3. The local backend receives the video URL.
+4. The backend calls Gemini to generate structured article content.
+5. The extension renders the response as a custom reading view.
+
+## Limitations
+
+- Shorts do not support read mode
+- The backend must be running locally for article generation to work
+- Gemini support for public YouTube URLs can be sensitive depending on the video
+- Unsupported, private, or restricted videos may fail
+- This is currently a working prototype, not a production extension
+
+## Recommended screenshots
+
+Yes — you should absolutely add screenshots.
+
+This project is very visual, and the README gets much stronger if people can immediately see the product idea.
+
+The best screenshots to add are:
+
+1. The read-mode decision dialog on a normal video
+2. The generated article overlay
+3. The Shorts unsupported popup
+4. An optional before-and-after comparison showing how the extension changes YouTube
+
+My recommendation:
+
+- add `3` core screenshots
+- keep them clean and cropped
+- put them near the top of the README, right after the intro
+
+That will make the project feel much more legit right away.
