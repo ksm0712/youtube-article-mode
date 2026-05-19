@@ -1,8 +1,6 @@
 .ytThumbnailViewModelImage,
-ytd-rich-item-renderer:has(ytd-ad-slot-renderer) {
-  display: none !important;
-}
-
+.ytLockupViewModelContentImage,
+ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
 ytd-rich-item-renderer:has(yt-collection-thumbnail-view-model) {
   display: none !important;
 }
