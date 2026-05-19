@@ -9,6 +9,7 @@ const SHORTS_SECTION_SELECTOR = [
   "ytd-item-section-renderer",
   "ytd-shelf-renderer"
 ].join(", ")
+let lastObservedPath = location.pathname
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -125,7 +126,45 @@ function wireShortsLinks(root = document) {
   })
 }
 
+async function requestArticleDirectly(payload) {
+  const response = await fetch("http://localhost:3000/api/article", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  })
+
+  const responseText = await response.text()
+
+  if (!response.ok) {
+    try {
+      const errorPayload = JSON.parse(responseText)
+      throw new Error(errorPayload.error || "The article server failed.")
+    } catch {
+      throw new Error(responseText || "The article server failed.")
+    }
+  }
+
+  if (!responseText.trim()) {
+    throw new Error("The article server returned an empty response.")
+  }
+
+  try {
+    return JSON.parse(responseText)
+  } catch {
+    throw new Error("The article server returned invalid JSON.")
+  }
+}
+
 function requestArticleFromBackground(payload) {
+  if (!chrome?.runtime?.sendMessage) {
+    return requestArticleDirectly(payload).then((payloadResponse) => ({
+      ok: true,
+      payload: payloadResponse
+    }))
+  }
+
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(
       {
@@ -303,7 +342,7 @@ function showDialog({ title, watchUrl, channel }) {
 }
 
 function showShortsDialog() {
-  closeDialog()
+  if (document.getElementById(DIALOG_ID)) return
 
   const dialog = document.createElement("div")
   dialog.id = DIALOG_ID
@@ -332,6 +371,13 @@ function showShortsDialog() {
   document.body.appendChild(dialog)
 }
 
+function ensureShortsDialogVisible() {
+  if (!document.body) return
+  if (!isShortsUrl(new URL(location.href))) return
+
+  showShortsDialog()
+}
+
 function interceptShortsNavigation(event) {
   const shortsAnchor = event.target.closest('a[href*="/shorts"], a[href="/feed/shorts"]')
   if (!shortsAnchor) return false
@@ -349,19 +395,23 @@ document.addEventListener("keydown", (event) => {
   }
 })
 
+window.setInterval(() => {
+  if (location.pathname !== lastObservedPath) {
+    lastObservedPath = location.pathname
+  }
+
+  ensureShortsDialogVisible()
+}, 250)
+
 if (document.body) {
   startShortsCleanup()
   wireShortsLinks()
-  if (isShortsUrl(new URL(location.href))) {
-    showShortsDialog()
-  }
+  ensureShortsDialogVisible()
 } else {
   window.addEventListener("DOMContentLoaded", () => {
     startShortsCleanup()
     wireShortsLinks()
-    if (isShortsUrl(new URL(location.href))) {
-      showShortsDialog()
-    }
+    ensureShortsDialogVisible()
   }, { once: true })
 }
 
