@@ -4,23 +4,132 @@ ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
 ytd-rich-item-renderer:has(yt-collection-thumbnail-view-model) {
   display: none !important;
 }
+
 .ytLockupMetadataViewModelTextContainer a {
   pointer-events: none !important;
-
 }
 
+#yt-article-dialog,
 #yt-article-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #0f0f0f;
-  color: white;
-  font-size: 48px;
-  font-family: sans-serif;
+  inset: 0;
+  z-index: 999999;
+}
+
+#yt-article-dialog {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999999;
+}
+
+.yt-article-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 15, 15, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.yt-article-dialog__panel,
+.yt-article-overlay__card {
+  position: relative;
+  width: min(560px, calc(100vw - 32px));
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(160deg, #1d1d1d 0%, #111111 100%);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  color: #f7f1e8;
+}
+
+.yt-article-dialog__panel {
+  padding: 28px;
+}
+
+.yt-article-dialog__eyebrow,
+.yt-article-overlay__eyebrow {
+  margin: 0 0 12px;
+  color: #ffb36b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.yt-article-dialog__title,
+.yt-article-overlay__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.1;
+}
+
+.yt-article-dialog__copy,
+.yt-article-overlay__meta {
+  margin: 14px 0 0;
+  color: rgba(247, 241, 232, 0.78);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.yt-article-dialog__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.yt-article-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+}
+
+.yt-article-button:hover {
+  transform: translateY(-1px);
+}
+
+.yt-article-button--primary {
+  background: #ffb36b;
+  color: #171717;
+}
+
+.yt-article-button--secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7f1e8;
+}
+
+#yt-article-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background:
+    radial-gradient(circle at top, rgba(255, 179, 107, 0.14), transparent 35%),
+    #0f0f0f;
+}
+
+.yt-article-overlay__card {
+  padding: 36px;
+}
+
+.yt-article-overlay__card .yt-article-button {
+  margin-top: 28px;
+}
+
+@media (max-width: 640px) {
+  .yt-article-dialog__panel,
+  .yt-article-overlay__card {
+    border-radius: 20px;
+  }
+
+  .yt-article-dialog__panel,
+  .yt-article-overlay__card {
+    padding: 22px;
+  }
+
+  .yt-article-dialog__actions {
+    flex-direction: column;
+  }
 }
