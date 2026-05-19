@@ -107,10 +107,9 @@ GEMINI_API_KEY=your_key_here node server.js
 4. Open `chrome://extensions`
 5. Turn on Developer Mode
 6. Click `Load unpacked`
-7. Select `/Users/karansinghmadia/Desktop/yt-article`
+7. Select path where this project is saved
 8. Reload the extension after code changes
 
-For a more explicit setup walkthrough, see `/Users/karansinghmadia/Desktop/yt-article/docs/SETUP.md`.
 
 ## How article generation works
 
