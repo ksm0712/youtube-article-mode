@@ -1,6 +1,12 @@
 const DIALOG_ID = "yt-article-dialog"
 const OVERLAY_ID = "yt-article-overlay"
 const VIDEO_CARD_SELECTOR = "ytd-rich-item-renderer, ytd-video-renderer"
+const SHORTS_SHELF_SELECTOR = "ytd-reel-shelf-renderer, ytd-rich-shelf-renderer"
+const SHORTS_SECTION_SELECTOR = [
+  "ytd-rich-section-renderer",
+  "ytd-item-section-renderer",
+  "ytd-shelf-renderer"
+].join(", ")
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -24,6 +30,57 @@ function closeOverlay() {
   document.getElementById(OVERLAY_ID)?.remove()
 }
 
+function removeShortsShelfBlocks(root = document) {
+  root.querySelectorAll(SHORTS_SHELF_SELECTOR).forEach((shelf) => {
+    const container = shelf.closest(SHORTS_SECTION_SELECTOR)
+
+    if (container) {
+      container.remove()
+      return
+    }
+
+    shelf.remove()
+  })
+}
+
+function removeShortsVideoCards(root = document) {
+  root.querySelectorAll('ytd-video-renderer a[href*="/shorts/"]').forEach((link) => {
+    link.closest("ytd-video-renderer")?.remove()
+  })
+}
+
+function startShortsCleanup() {
+  removeShortsShelfBlocks()
+  removeShortsVideoCards()
+
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      mutation.addedNodes.forEach((node) => {
+        if (!(node instanceof HTMLElement)) return
+
+        if (node.matches?.(SHORTS_SHELF_SELECTOR)) {
+          const container = node.closest(SHORTS_SECTION_SELECTOR)
+          ;(container || node).remove()
+          return
+        }
+
+        if (node.matches?.("ytd-video-renderer") && node.querySelector('a[href*="/shorts/"]')) {
+          node.remove()
+          return
+        }
+
+        removeShortsShelfBlocks(node)
+        removeShortsVideoCards(node)
+      })
+    }
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
+}
+
 function getVideoCard(target) {
   return target.closest(VIDEO_CARD_SELECTOR)
 }
@@ -33,6 +90,10 @@ function getCanonicalWatchUrl(url) {
   if (!videoId) return null
 
   return `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`
+}
+
+function isShortsUrl(url) {
+  return url.pathname.includes("/shorts/")
 }
 
 function requestArticleFromBackground(payload) {
@@ -212,6 +273,36 @@ function showDialog({ title, watchUrl, channel }) {
   document.body.appendChild(dialog)
 }
 
+function showShortsDialog() {
+  closeDialog()
+
+  const dialog = document.createElement("div")
+  dialog.id = DIALOG_ID
+  dialog.innerHTML = `
+    <div class="yt-article-dialog__backdrop"></div>
+    <div class="yt-article-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="yt-article-dialog-title">
+      <p class="yt-article-dialog__eyebrow">Read mode unavailable</p>
+      <h2 id="yt-article-dialog-title" class="yt-article-dialog__title">Shorts do not have read mode</h2>
+      <p class="yt-article-dialog__copy">Short-form content is not supported yet. Go back and pick a full video instead.</p>
+      <div class="yt-article-dialog__actions">
+        <button class="yt-article-button yt-article-button--secondary" type="button" data-action="back">
+          Go back
+        </button>
+      </div>
+    </div>
+  `
+
+  dialog.addEventListener("click", (event) => {
+    const action = event.target.dataset?.action
+
+    if (action === "back" || event.target.classList.contains("yt-article-dialog__backdrop")) {
+      closeDialog()
+    }
+  })
+
+  document.body.appendChild(dialog)
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeDialog()
@@ -219,14 +310,37 @@ document.addEventListener("keydown", (event) => {
   }
 })
 
+if (document.body) {
+  startShortsCleanup()
+} else {
+  window.addEventListener("DOMContentLoaded", startShortsCleanup, { once: true })
+}
+
 document.addEventListener("click", (event) => {
+  const shortsAnchor = event.target.closest('a[href*="/shorts/"]')
+  if (shortsAnchor) {
+    event.preventDefault()
+    event.stopPropagation()
+    showShortsDialog()
+    return
+  }
+
   const card = getVideoCard(event.target)
   if (!card) return
 
   const link = card.querySelector("a[href*='/watch']")
-  if (!link) return
+  const shortsLink = card.querySelector("a[href*='/shorts/']")
+  const primaryLink = link || shortsLink
+  if (!primaryLink) return
 
-  const url = new URL(link.href)
+  const url = new URL(primaryLink.href)
+  if (isShortsUrl(url)) {
+    event.preventDefault()
+    event.stopPropagation()
+    showShortsDialog()
+    return
+  }
+
   const watchUrl = getCanonicalWatchUrl(url)
   if (!watchUrl) return
 
