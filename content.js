@@ -1,5 +1,6 @@
 const DIALOG_ID = "yt-article-dialog"
 const OVERLAY_ID = "yt-article-overlay"
+const VIDEO_CARD_SELECTOR = "ytd-rich-item-renderer, ytd-video-renderer"
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => {
@@ -21,6 +22,10 @@ function closeDialog() {
 
 function closeOverlay() {
   document.getElementById(OVERLAY_ID)?.remove()
+}
+
+function getVideoCard(target) {
+  return target.closest(VIDEO_CARD_SELECTOR)
 }
 
 function getCanonicalWatchUrl(url) {
@@ -215,7 +220,7 @@ document.addEventListener("keydown", (event) => {
 })
 
 document.addEventListener("click", (event) => {
-  const card = event.target.closest("ytd-rich-item-renderer")
+  const card = getVideoCard(event.target)
   if (!card) return
 
   const link = card.querySelector("a[href*='/watch']")

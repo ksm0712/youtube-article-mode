@@ -1,11 +1,24 @@
 .ytThumbnailViewModelImage,
 .ytLockupViewModelContentImage,
+ytd-video-renderer ytd-thumbnail,
+ytd-video-renderer #thumbnail,
 ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
-ytd-rich-item-renderer:has(yt-collection-thumbnail-view-model) {
+ytd-rich-item-renderer:has(yt-collection-thumbnail-view-model),
+ytd-search ytd-shelf-renderer,
+ytd-search ytd-playlist-renderer,
+ytd-search ytd-radio-renderer,
+ytd-search ytd-promoted-sparkles-web-renderer,
+ytd-search ytd-ad-slot-renderer,
+ytd-video-renderer:has(ytd-ad-slot-renderer) {
   display: none !important;
 }
 
 .ytLockupMetadataViewModelTextContainer a {
+  pointer-events: none !important;
+}
+
+ytd-video-renderer a#thumbnail,
+ytd-video-renderer ytd-thumbnail a {
   pointer-events: none !important;
 }
 
