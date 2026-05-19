@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Article Mode",
+  "version": "0.1",
+  "description": "Turns YouTube videos into articles.",
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
