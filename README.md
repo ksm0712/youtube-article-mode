@@ -12,15 +12,16 @@ Instead of dropping the user straight into video playback, the extension interce
 
 ### Article generation state
 
-![Article generation state](docs/screenshots/loading-state.png)
+<img width="1462" height="806" alt="download-2" src="https://github.com/user-attachments/assets/b08895cd-aab0-493a-b81e-82ae3e0517e4" />
 
 ### Generated article view
 
-![Generated article view](docs/screenshots/article-view.png)
+<img width="1470" height="801" alt="download-4" src="https://github.com/user-attachments/assets/8e8bfffe-f755-448f-a2c4-00dff057bdc8" />
 
 ### Shorts unsupported state
 
-![Shorts unsupported state](docs/screenshots/shorts-unsupported.png)
+<img width="1470" height="818" alt="download-5" src="https://github.com/user-attachments/assets/5f1abed0-dc24-4342-9a46-4bf211618621" />
+
 
 ## Why this exists
 
