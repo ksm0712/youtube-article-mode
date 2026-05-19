@@ -4,3 +4,23 @@ ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
 ytd-rich-item-renderer:has(yt-collection-thumbnail-view-model) {
   display: none !important;
 }
+.ytLockupMetadataViewModelTextContainer a {
+  pointer-events: none !important;
+
+}
+
+#yt-article-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0f0f0f;
+  color: white;
+  font-size: 48px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
