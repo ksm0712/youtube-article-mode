@@ -94,29 +94,6 @@ This project pushes in the other direction:
 - Extension background worker to forward requests
 - No end-user API key prompt inside the extension UI
 
-## Project structure
-
-- `/Users/karansinghmadia/Desktop/yt-article/content.js`
-  Main content script. Handles click interception, dialogs, article overlay rendering, and in-page YouTube behavior.
-
-- `/Users/karansinghmadia/Desktop/yt-article/content.css`
-  Styling for dialogs, overlays, and the reader experience.
-
-- `/Users/karansinghmadia/Desktop/yt-article/background.js`
-  Extension background worker that forwards article-generation requests to the backend.
-
-- `/Users/karansinghmadia/Desktop/yt-article/server.js`
-  Local backend that calls Gemini and returns structured article data.
-
-- `/Users/karansinghmadia/Desktop/yt-article/manifest.json`
-  Chrome extension manifest and permissions.
-
-- `/Users/karansinghmadia/Desktop/yt-article/docs/FEATURES.md`
-  Detailed feature reference.
-
-- `/Users/karansinghmadia/Desktop/yt-article/docs/SETUP.md`
-  Local setup and troubleshooting notes.
-
 ## Local setup
 
 1. Make sure Node.js is installed.
