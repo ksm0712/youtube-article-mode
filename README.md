@@ -6,9 +6,9 @@ Instead of dropping the user straight into video playback, the extension interce
 
 ## Product preview
 
-### Read-mode prompt
+### Revised Feed without Thumbnails
 
-![Read-mode prompt](docs/screenshots/read-mode-dialog.png)
+<img width="1218" height="693" alt="Screenshot 2026-05-19 at 4 11 48 PM" src="https://github.com/user-attachments/assets/a5dcac9d-1266-4844-878c-95cf0614e751" />
 
 ### Article generation state
 
