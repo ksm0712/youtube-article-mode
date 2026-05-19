@@ -2,6 +2,8 @@
 .ytLockupViewModelContentImage,
 ytd-video-renderer ytd-thumbnail,
 ytd-video-renderer #thumbnail,
+ytd-guide-entry-renderer:has(a[href="/shorts"]),
+ytd-guide-entry-renderer:has(a[href="/feed/shorts"]),
 ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
 ytd-rich-item-renderer:has(yt-collection-thumbnail-view-model),
 ytd-rich-item-renderer:has(a[href*="/shorts/"]),

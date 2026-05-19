@@ -1,6 +1,8 @@
 const DIALOG_ID = "yt-article-dialog"
 const OVERLAY_ID = "yt-article-overlay"
 const VIDEO_CARD_SELECTOR = "ytd-rich-item-renderer, ytd-video-renderer"
+const SHORTS_LINK_SELECTOR = 'a[href="/shorts"], a[href="/feed/shorts"], a[href^="/shorts/"]'
+const SHORTS_GUIDE_SELECTOR = "ytd-guide-entry-renderer, tp-yt-paper-item"
 const SHORTS_SHELF_SELECTOR = "ytd-reel-shelf-renderer, ytd-rich-shelf-renderer"
 const SHORTS_SECTION_SELECTOR = [
   "ytd-rich-section-renderer",
@@ -93,7 +95,34 @@ function getCanonicalWatchUrl(url) {
 }
 
 function isShortsUrl(url) {
-  return url.pathname.includes("/shorts/")
+  return url.pathname === "/shorts" || url.pathname.startsWith("/shorts/") || url.pathname === "/feed/shorts"
+}
+
+function isShortsGuideEntry(target) {
+  const entry = target.closest(SHORTS_GUIDE_SELECTOR)
+  if (!entry) return false
+
+  const text = entry.textContent?.trim().toLowerCase() || ""
+  const hasShortsLink = !!entry.querySelector(SHORTS_LINK_SELECTOR)
+
+  return hasShortsLink || text === "shorts"
+}
+
+function handleShortsActivation(event) {
+  event.preventDefault()
+  event.stopPropagation()
+  event.stopImmediatePropagation()
+  showShortsDialog()
+}
+
+function wireShortsLinks(root = document) {
+  root.querySelectorAll(SHORTS_LINK_SELECTOR).forEach((link) => {
+    if (link.dataset.ytArticleShortsWired === "1") return
+
+    link.dataset.ytArticleShortsWired = "1"
+    link.addEventListener("pointerdown", handleShortsActivation, true)
+    link.addEventListener("click", handleShortsActivation, true)
+  })
 }
 
 function requestArticleFromBackground(payload) {
@@ -303,6 +332,16 @@ function showShortsDialog() {
   document.body.appendChild(dialog)
 }
 
+function interceptShortsNavigation(event) {
+  const shortsAnchor = event.target.closest('a[href*="/shorts"], a[href="/feed/shorts"]')
+  if (!shortsAnchor) return false
+
+  event.preventDefault()
+  event.stopPropagation()
+  showShortsDialog()
+  return true
+}
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeDialog()
@@ -312,18 +351,59 @@ document.addEventListener("keydown", (event) => {
 
 if (document.body) {
   startShortsCleanup()
+  wireShortsLinks()
+  if (isShortsUrl(new URL(location.href))) {
+    showShortsDialog()
+  }
 } else {
-  window.addEventListener("DOMContentLoaded", startShortsCleanup, { once: true })
+  window.addEventListener("DOMContentLoaded", () => {
+    startShortsCleanup()
+    wireShortsLinks()
+    if (isShortsUrl(new URL(location.href))) {
+      showShortsDialog()
+    }
+  }, { once: true })
 }
 
-document.addEventListener("click", (event) => {
-  const shortsAnchor = event.target.closest('a[href*="/shorts/"]')
-  if (shortsAnchor) {
-    event.preventDefault()
-    event.stopPropagation()
-    showShortsDialog()
+const shortsLinkObserver = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return
+      wireShortsLinks(node)
+    })
+  }
+})
+
+if (document.body) {
+  shortsLinkObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
+} else {
+  window.addEventListener("DOMContentLoaded", () => {
+    shortsLinkObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    })
+  }, { once: true })
+}
+
+document.addEventListener("pointerdown", (event) => {
+  if (isShortsGuideEntry(event.target)) {
+    handleShortsActivation(event)
     return
   }
+
+  interceptShortsNavigation(event)
+}, true)
+
+document.addEventListener("click", (event) => {
+  if (isShortsGuideEntry(event.target)) {
+    handleShortsActivation(event)
+    return
+  }
+
+  if (interceptShortsNavigation(event)) return
 
   const card = getVideoCard(event.target)
   if (!card) return
