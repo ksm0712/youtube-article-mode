@@ -1,8 +1,15 @@
 {
   "manifest_version": 3,
   "name": "YouTube Article Mode",
-  "version": "0.1",
-  "description": "Turns YouTube videos into articles.",
+  "version": "0.3",
+  "description": "Turns YouTube videos into readable AI-generated articles.",
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "http://localhost:3000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
