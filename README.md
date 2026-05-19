@@ -4,6 +4,24 @@ YouTube Article Mode is a Chrome extension that turns YouTube into a more delibe
 
 Instead of dropping the user straight into video playback, the extension intercepts supported video clicks and offers a calmer choice: read an article version or go back. The goal is simple: keep the useful part of YouTube, reduce the compulsive part.
 
+## Product preview
+
+### Read-mode prompt
+
+![Read-mode prompt](docs/screenshots/read-mode-dialog.png)
+
+### Article generation state
+
+![Article generation state](docs/screenshots/loading-state.png)
+
+### Generated article view
+
+![Generated article view](docs/screenshots/article-view.png)
+
+### Shorts unsupported state
+
+![Shorts unsupported state](docs/screenshots/shorts-unsupported.png)
+
 ## Why this exists
 
 YouTube is extremely good at making people keep watching.
@@ -136,24 +154,3 @@ Instead, the flow is:
 - Gemini support for public YouTube URLs can be sensitive depending on the video
 - Unsupported, private, or restricted videos may fail
 - This is currently a working prototype, not a production extension
-
-## Recommended screenshots
-
-Yes — you should absolutely add screenshots.
-
-This project is very visual, and the README gets much stronger if people can immediately see the product idea.
-
-The best screenshots to add are:
-
-1. The read-mode decision dialog on a normal video
-2. The generated article overlay
-3. The Shorts unsupported popup
-4. An optional before-and-after comparison showing how the extension changes YouTube
-
-My recommendation:
-
-- add `3` core screenshots
-- keep them clean and cropped
-- put them near the top of the README, right after the intro
-
-That will make the project feel much more legit right away.

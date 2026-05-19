@@ -88,6 +88,40 @@ function getVideoCard(target) {
   return target.closest(VIDEO_CARD_SELECTOR)
 }
 
+function getCardVideoTitle(card, primaryLink) {
+  const titleSelectors = [
+    "#video-title",
+    "#video-title-link",
+    "a#video-title",
+    "a#video-title-link",
+    "h3 a",
+    "#details a[title]",
+    "yt-formatted-string#video-title"
+  ]
+
+  for (const selector of titleSelectors) {
+    const element = card.querySelector(selector)
+    if (!element) continue
+
+    const text = element.textContent?.trim()
+    if (text) return text
+
+    const attributeTitle = element.getAttribute?.("title")?.trim()
+    if (attributeTitle) return attributeTitle
+  }
+
+  const linkTitle = primaryLink?.getAttribute("title")?.trim()
+  if (linkTitle) return linkTitle
+
+  const ariaLabel = primaryLink?.getAttribute("aria-label")?.trim()
+  if (ariaLabel) {
+    const firstLine = ariaLabel.split("\n")[0]?.trim()
+    if (firstLine) return firstLine
+  }
+
+  return "This video"
+}
+
 function getCanonicalWatchUrl(url) {
   const videoId = url.searchParams.get("v")
   if (!videoId) return null
@@ -474,10 +508,7 @@ document.addEventListener("click", (event) => {
   const watchUrl = getCanonicalWatchUrl(url)
   if (!watchUrl) return
 
-  const title =
-    card.querySelector("#video-title")?.textContent?.trim() ||
-    card.querySelector('a[title]')?.getAttribute("title") ||
-    "This video"
+  const title = getCardVideoTitle(card, primaryLink)
 
   const channel =
     card.querySelector("ytd-channel-name")?.textContent?.trim() ||
